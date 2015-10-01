@@ -1,15 +1,25 @@
-package com.notewidgets.appforest.notewidgets;
+package com.notewidgets.appforest.notewidgets.activities;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.notewidgets.appforest.notewidgets.R;
+
 public class NoteActivity extends AppCompatActivity {
+
+    private static String CLASS_NAME;
+
+    public NoteActivity(){
+        this.CLASS_NAME = getClass().getName();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(CLASS_NAME, "onCreate()");
         setContentView(R.layout.activity_note);
     }
 
