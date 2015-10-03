@@ -1,16 +1,27 @@
 package com.notewidgets.appforest.notewidgets.activities;
 
+import android.appwidget.AppWidgetManager;
+import android.content.Intent;
+import android.os.*;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.RemoteViews;
+import android.widget.TextView;
 
+import com.notewidgets.appforest.notewidgets.BuildConfig;
 import com.notewidgets.appforest.notewidgets.R;
+import com.notewidgets.appforest.notewidgets.helpers.SQLiteHelper;
+import com.notewidgets.appforest.notewidgets.model.Note;
 
 public class NoteActivity extends AppCompatActivity {
 
     private static String CLASS_NAME;
+    private SQLiteHelper sqLiteHelper;
+    private int mAppWidgetId;
 
     public NoteActivity(){
         this.CLASS_NAME = getClass().getName();
@@ -18,8 +29,22 @@ public class NoteActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         Log.d(CLASS_NAME, "onCreate()");
+        enableStrictMode();
+
+        this.setResult(RESULT_CANCELED);
+
+        Intent intent = getIntent();
+        Bundle extras = intent.getExtras();
+        if(extras != null){
+            mAppWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
+        }
+
+        super.onCreate(savedInstanceState);
+
+        this.sqLiteHelper = SQLiteHelper.getInstance(getApplicationContext());
+
+
         setContentView(R.layout.activity_note);
     }
 
@@ -43,5 +68,94 @@ public class NoteActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void saveNote(View view){
+        Log.d(CLASS_NAME, "saveNote()");
+        Note note = new Note();
+
+        String noteTitle = ((EditText) findViewById(R.id.main_edit_title_text)).getText().toString();
+        String noteBody = ((EditText) findViewById(R.id.main_edit_text)).getText().toString();
+
+        note.saveNote(sqLiteHelper, noteTitle, noteBody);
+
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
+        RemoteViews views = new RemoteViews(this.getPackageName(), R.layout.note_widget);
+
+        views.setTextViewText(R.id.widget_title_text, noteTitle);
+        views.setTextViewText(R.id.widget_body_text, noteBody);
+
+        appWidgetManager.updateAppWidget(mAppWidgetId, views);
+
+        Log.d(CLASS_NAME, "appWidgetId: " + mAppWidgetId);
+
+        Intent resultValue = new Intent();
+        resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
+        setResult(RESULT_OK, resultValue);
+
+        finish();
+    }
+
+    @Override
+    public void onPause(){
+        Log.d(CLASS_NAME, "onPause()");
+        super.onPause();
+    }
+
+    @Override
+    public void onStop(){
+        Log.d(CLASS_NAME, "onStop()");
+        super.onStop();
+    }
+
+    @Override
+     public void onDestroy(){
+        Log.d(CLASS_NAME, "onDestroy()");
+        super.onDestroy();
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    private void enableStrictMode() {
+        if(BuildConfig.DEBUG){
+            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
+            try {
+                StrictMode.setVmPolicy(new StrictMode.VmPolicy
+                        .Builder()
+                        .detectLeakedClosableObjects()
+                        .detectLeakedSqlLiteObjects()
+                        .setClassInstanceLimit(Class.forName("com.notewidgets.appforest.notewidgets.activities.NoteActivity"), 100)
+                        .penaltyLog()
+                        .penaltyDeath()
+                        .build());
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

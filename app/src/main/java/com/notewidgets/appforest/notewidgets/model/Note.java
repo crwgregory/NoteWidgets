@@ -1,18 +1,20 @@
 package com.notewidgets.appforest.notewidgets.model;
 
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
+
+import com.notewidgets.appforest.notewidgets.helpers.SQLiteHelper;
 
 /**
  * Created by Greg Christopherson on 10/1/2015.
  */
 public class Note {
 
-    private long _id;
-    private long date_created;
-    private String note;
-
-
+    private Long _id = null;
+    private Long date_created;
+    private String note_title;
+    private String note_body;
 
     private static String CLASS_NAME;
 
@@ -25,7 +27,8 @@ public class Note {
         String sql = "CREATE TABLE IF NOT EXISTS notes "
                 +"(_id INTEGER PRIMARY KEY AUTOINCREMENT, "
                 +"date_created INTEGER NOT NULL, "
-                +"note TEXT);";
+                +"note_title TEXT, "
+                +"note_body TEXT);";
         database.execSQL(sql);
     }
 
@@ -35,12 +38,33 @@ public class Note {
         database.execSQL(sql);
     }
 
-    @Override
-    public String toString(){
-        return note;
+    public void saveNote(SQLiteHelper helper, String title, String body){
+
+        SQLiteDatabase database = helper.getWritableDatabase();
+
+        this.date_created = System.currentTimeMillis();
+        this.note_title = "'"+title+"'";
+        this.note_body = "'"+body+"'";
+
+        String sql = "INSERT INTO notes (date_created, note_title, note_body) VALUES ("
+                +this.date_created + ", "
+                +this.note_title + ", "
+                +this.note_body + ");";
+        database.execSQL(sql);
+
+        //set _id to generated Primary Key
+        Cursor cursor = database.rawQuery("SELECT * FROM notes;", null);
+        cursor.moveToLast();
+        _id = cursor.getLong(cursor.getColumnIndex("_id"));
+        cursor.close();
     }
 
-    public long get_id() {
+    @Override
+    public String toString(){
+        return note_body;
+    }
+
+    public Long get_id() {
         return _id;
     }
 
@@ -48,7 +72,7 @@ public class Note {
         this._id = _id;
     }
 
-    public long getDate_created() {
+    public Long getDate_created() {
         return date_created;
     }
 
@@ -56,12 +80,20 @@ public class Note {
         this.date_created = date_created;
     }
 
-    public String getNote() {
-        return note;
+    public String getNote_body() {
+        return note_body;
     }
 
-    public void setNote(String note) {
-        this.note = note;
+    public void setNote_body(String note_body) {
+        this.note_body = note_body;
+    }
+
+    public String getNote_title() {
+        return note_title;
+    }
+
+    public void setNote_title(String note_title) {
+        this.note_title = note_title;
     }
 
 }

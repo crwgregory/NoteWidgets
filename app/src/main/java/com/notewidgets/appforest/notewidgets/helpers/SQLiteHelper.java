@@ -14,9 +14,8 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
     private static SQLiteHelper sqLiteHelper = null;
     private static final String DATABASE_NAME = "NoteForest.db";
-    private static final int DATABASE_VERSION= 1;
+    private static final int DATABASE_VERSION= 3;
     private static String CLASS_NAME;
-    private SQLiteDatabase sqLiteDatabase;
 
     public static SQLiteHelper getInstance(Context context){
         if(sqLiteHelper == null){
@@ -50,13 +49,13 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
     public void create(){
         Log.d(CLASS_NAME, "create()");
-        this.sqLiteDatabase = getWritableDatabase();
-//        this.sqLiteDatabase.execSQL("INSERT INTO notes (date_created, note) VALUES (" + System.currentTimeMillis()
-//                                    +", 'This is a note.');");
+        getWritableDatabase();
     }
 
-    protected SQLiteDatabase getDatabase(){
-        return sqLiteDatabase;
-    }
+
+    //Use method getWrittableDatabase()
+//    public SQLiteDatabase getDatabase(){
+//        return this.sqLiteDatabase;
+//    }
 
 }
