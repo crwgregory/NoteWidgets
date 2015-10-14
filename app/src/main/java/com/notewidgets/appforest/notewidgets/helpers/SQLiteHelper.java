@@ -14,7 +14,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
     private static SQLiteHelper sqLiteHelper = null;
     private static final String DATABASE_NAME = "NoteForest.db";
-    private static final int DATABASE_VERSION= 3;
+    private static final int DATABASE_VERSION= 6;
     private static String CLASS_NAME;
 
     public static SQLiteHelper getInstance(Context context){

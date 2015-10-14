@@ -1,5 +1,6 @@
 package com.notewidgets.appforest.notewidgets.activities;
 
+import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.Intent;
 import android.os.*;
@@ -21,7 +22,9 @@ public class NoteActivity extends AppCompatActivity {
 
     private static String CLASS_NAME;
     private SQLiteHelper sqLiteHelper;
-    private int mAppWidgetId;
+    private Integer mAppWidgetId;
+    private String noteTitle;
+    private String noteBody;
 
     public NoteActivity(){
         this.CLASS_NAME = getClass().getName();
@@ -30,22 +33,32 @@ public class NoteActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(CLASS_NAME, "onCreate()");
-        enableStrictMode();
-
+        super.onCreate(savedInstanceState);
         this.setResult(RESULT_CANCELED);
+        setContentView(R.layout.activity_note);
+        this.sqLiteHelper = SQLiteHelper.getInstance(getApplicationContext());
+        Note note = new Note(sqLiteHelper);
+
 
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
         if(extras != null){
-            mAppWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
+            this.mAppWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
+
+            if(this.mAppWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
+                Log.d(CLASS_NAME, "Valid AppWidgetID: " + this.mAppWidgetId);
+                note = note.getNote(this.mAppWidgetId);
+                if(note != null){
+                    EditText title = (EditText) findViewById(R.id.main_edit_title_text);
+                    EditText body = (EditText) findViewById(R.id.main_edit_text);
+                    title.setText(note.getNote_title(), TextView.BufferType.EDITABLE);
+                    body.setText(note.getNote_body(), TextView.BufferType.EDITABLE);
+                }
+            } else {
+                //invalid app widget id, exit.
+                finish();
+            }
         }
-
-        super.onCreate(savedInstanceState);
-
-        this.sqLiteHelper = SQLiteHelper.getInstance(getApplicationContext());
-
-
-        setContentView(R.layout.activity_note);
     }
 
     @Override
@@ -70,30 +83,53 @@ public class NoteActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle state){
+        Log.d(CLASS_NAME, "onSaveInstanceState()");
+        super.onSaveInstanceState(state);
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle state){
+        Log.d(CLASS_NAME, "onRestoreInstanceState()");
+        super.onRestoreInstanceState(state);
+    }
+
     public void saveNote(View view){
         Log.d(CLASS_NAME, "saveNote()");
-        Note note = new Note();
-
-        String noteTitle = ((EditText) findViewById(R.id.main_edit_title_text)).getText().toString();
-        String noteBody = ((EditText) findViewById(R.id.main_edit_text)).getText().toString();
-
-        note.saveNote(sqLiteHelper, noteTitle, noteBody);
-
-        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
-        RemoteViews views = new RemoteViews(this.getPackageName(), R.layout.note_widget);
-
-        views.setTextViewText(R.id.widget_title_text, noteTitle);
-        views.setTextViewText(R.id.widget_body_text, noteBody);
-
-        appWidgetManager.updateAppWidget(mAppWidgetId, views);
-
         Log.d(CLASS_NAME, "appWidgetId: " + mAppWidgetId);
+        Note note = new Note(sqLiteHelper);
+        noteTitle = ((EditText) findViewById(R.id.main_edit_title_text)).getText().toString();
+        noteBody = ((EditText) findViewById(R.id.main_edit_text)).getText().toString();
+        note.saveNote(mAppWidgetId, noteTitle, noteBody);
+        updateWidget();
+        returnResult();
+        finish();
+    }
 
+    private void returnResult() {
+        Log.d(CLASS_NAME, "returnResult()");
         Intent resultValue = new Intent();
         resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
         setResult(RESULT_OK, resultValue);
+    }
 
-        finish();
+    private void updateWidget() {
+        Log.d(CLASS_NAME, "updateWidget()");
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
+        RemoteViews views = new RemoteViews(this.getPackageName(), R.layout.note_widget);
+        views.setTextViewText(R.id.widget_title_text, noteTitle);
+        views.setTextViewText(R.id.widget_body_text, noteBody);
+        setPendingIntent(views);
+        appWidgetManager.updateAppWidget(mAppWidgetId, views);
+    }
+
+    private void setPendingIntent(RemoteViews views){
+        Log.d(CLASS_NAME, "setPendingIntent()");
+        Intent intent = new Intent(this.getApplicationContext(), this.getClass());
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, this.mAppWidgetId);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this.getApplicationContext(), this.mAppWidgetId, intent, 0);
+        views.setOnClickPendingIntent(R.id.widget_body_text, pendingIntent);
     }
 
     @Override

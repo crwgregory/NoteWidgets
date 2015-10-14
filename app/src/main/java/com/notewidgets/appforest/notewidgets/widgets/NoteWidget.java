@@ -30,22 +30,22 @@ public class NoteWidget extends AppWidgetProvider {
         final int N = appWidgetIds.length;
         for (int i = 0; i < N; i++) {
             Log.d(CLASS_NAME, "onUpdate()");
-            Log.d(CLASS_NAME, "size of appWidgetIds: " + N);
-            Log.d(CLASS_NAME, "app id: " + i);
-            int appWidgetId = appWidgetIds[i];
-
-
-
-            //Create new intent to be called on widget click
-            Intent intent = new Intent(context, NoteActivity.class);
-            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-            //Get the layout for the widget and attach an onclick listener
-            RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.note_widget);
-            views.setOnClickPendingIntent(R.id.widget_body_text, pendingIntent);
-
-            //Tell AppWidgetManager to perform update on the current widget
-            appWidgetManager.updateAppWidget(appWidgetId, views);
+//            Log.d(CLASS_NAME, "size of appWidgetIds: " + N);
+//            Log.d(CLASS_NAME, "app id: " + i);
+//            int appWidgetId = appWidgetIds[i];
+//
+//
+//
+//            //Create new intent to be called on widget click
+//            Intent intent = new Intent(context, NoteActivity.class);
+//            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+//
+//            //Get the layout for the widget and attach an onclick listener
+//            RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.note_widget);
+//            views.setOnClickPendingIntent(R.id.widget_body_text, pendingIntent);
+//
+//            //Tell AppWidgetManager to perform update on the current widget
+//            appWidgetManager.updateAppWidget(appWidgetId, views);
 
         }
     }
