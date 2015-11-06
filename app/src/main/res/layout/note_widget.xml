@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="@dimen/widget_margin"
-    android:background="#09C"
+    android:background="#000000"
     android:orientation="vertical">
 
 
@@ -12,13 +12,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:text="@string/appwidget_text"
+        android:text="@string/title_filler"
         android:textColor="#ffffff"
-        android:textSize="12sp"
+        android:textSize="16sp"
         android:textStyle=""
         android:layout_margin="8dp"
-        android:contentDescription="@string/appwidget_text"
-        android:background="#09C" />
+        android:contentDescription="@string/title_description" />
 
     <TextView
         android:id="@+id/widget_body_text"
@@ -26,12 +25,11 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:gravity="center_horizontal"
-        android:text="@string/appwidget_text"
+        android:text="@string/body_filler"
         android:textColor="#ffffff"
         android:textSize="12sp"
         android:textStyle=""
         android:layout_margin="8dp"
-        android:contentDescription="@string/appwidget_text"
-        android:background="#09C" />
+        android:contentDescription="@string/body_description" />
 
 </LinearLayout>

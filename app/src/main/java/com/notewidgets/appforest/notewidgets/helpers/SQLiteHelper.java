@@ -51,11 +51,4 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         Log.d(CLASS_NAME, "create()");
         getWritableDatabase();
     }
-
-
-    //Use method getWrittableDatabase()
-//    public SQLiteDatabase getDatabase(){
-//        return this.sqLiteDatabase;
-//    }
-
 }

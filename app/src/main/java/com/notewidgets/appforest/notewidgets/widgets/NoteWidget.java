@@ -11,6 +11,8 @@ import android.widget.RemoteViews;
 import com.notewidgets.appforest.notewidgets.R;
 import com.notewidgets.appforest.notewidgets.activities.NoteActivity;
 import com.notewidgets.appforest.notewidgets.helpers.SQLiteHelper;
+import com.notewidgets.appforest.notewidgets.helpers.WidgetHelper;
+import com.notewidgets.appforest.notewidgets.model.Note;
 
 /**
  * Implementation of App Widget functionality.
@@ -18,7 +20,8 @@ import com.notewidgets.appforest.notewidgets.helpers.SQLiteHelper;
 public class NoteWidget extends AppWidgetProvider {
 
     private static String CLASS_NAME;
-    private static final String PK = "primary_key_identifier";
+    private Note note;
+    private NoteActivity noteActivity = new NoteActivity();
 
     public NoteWidget(){
         this.CLASS_NAME = getClass().getName();
@@ -27,26 +30,18 @@ public class NoteWidget extends AppWidgetProvider {
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         // There may be multiple widgets active, so update all of them
+
+
         final int N = appWidgetIds.length;
         for (int i = 0; i < N; i++) {
-            Log.d(CLASS_NAME, "onUpdate()");
-//            Log.d(CLASS_NAME, "size of appWidgetIds: " + N);
-//            Log.d(CLASS_NAME, "app id: " + i);
-//            int appWidgetId = appWidgetIds[i];
-//
-//
-//
-//            //Create new intent to be called on widget click
-//            Intent intent = new Intent(context, NoteActivity.class);
-//            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-//
-//            //Get the layout for the widget and attach an onclick listener
-//            RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.note_widget);
-//            views.setOnClickPendingIntent(R.id.widget_body_text, pendingIntent);
-//
-//            //Tell AppWidgetManager to perform update on the current widget
-//            appWidgetManager.updateAppWidget(appWidgetId, views);
-
+            Log.d(CLASS_NAME, "onUpdate() widgetId: " + appWidgetIds[i]);
+            if(note == null){
+                onEnabled(context);
+            }
+            note = note.getNote(appWidgetIds[i]);
+            if(note != null){
+                WidgetHelper.updateWidget(context, appWidgetIds[i], note.getNote_title(), note.getNote_body());
+            }
         }
     }
 
@@ -57,24 +52,13 @@ public class NoteWidget extends AppWidgetProvider {
         Log.d(CLASS_NAME, "onEnabled()");
         SQLiteHelper helper = SQLiteHelper.getInstance(context);
         helper.create();
+        note = new Note(helper);
     }
 
     @Override
     public void onDisabled(Context context) {
         Log.d(CLASS_NAME, "onDisabled()");
         // Enter relevant functionality for when the last widget is disabled
-    }
-
-    public static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
-        Log.d(CLASS_NAME, "updateAppWidget()");
-
-        CharSequence widgetText = context.getString(R.string.appwidget_text);
-        // Construct the RemoteViews object
-        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.note_widget);
-        views.setTextViewText(R.id.widget_body_text, widgetText);
-
-        // Instruct the widget manager to update the widget
-        appWidgetManager.updateAppWidget(appWidgetId, views);
     }
 }
 

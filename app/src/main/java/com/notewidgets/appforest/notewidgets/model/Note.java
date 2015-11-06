@@ -48,27 +48,29 @@ public class Note {
         SQLiteDatabase database = helper.getWritableDatabase();
         String sql;
 
-        this.note_title = title;
-        this.note_body = body;
-
         if(getNote(appWidgetId) == null){
-            this.date_created = System.currentTimeMillis();
+            date_created = System.currentTimeMillis();
             Log.d(CLASS_NAME, "Creating new row");
             sql = "INSERT INTO notes (app_widget_id, date_created, note_title, note_body) VALUES ("
-                    +this.appWidgetId + ", "
-                    +this.date_created + ", '"
-                    +this.note_title + "', '"
-                    +this.note_body + "');";
+                    +appWidgetId + ", "
+                    +date_created + ", '"
+                    +title + "', '"
+                    +body + "');";
         } else {
             Log.d(CLASS_NAME, "updating row");
             sql = "UPDATE notes SET "
-                    +"note_title = '"+this.note_title + "', "
-                    +"note_body = '"+this.note_body + "' "
-                    +"WHERE app_widget_id = " + this.appWidgetId
+                    +"note_title = '"+title + "', "
+                    +"note_body = '"+body + "' "
+                    +"WHERE app_widget_id = " + appWidgetId
                     +";";
         }
-        Log.d(CLASS_NAME, "Date created: " + this.date_created.toString());
-
+        Log.d(CLASS_NAME, "Date created: " + date_created.toString());
+        Log.d(CLASS_NAME, "Widget ID: " + appWidgetId);
+        Log.d(CLASS_NAME, "UPDATE notes SET "
+                +"note_title = '"+title + "', "
+                +"note_body = '"+body + "' "
+                +"WHERE app_widget_id = " + appWidgetId
+                +";");
         database.execSQL(sql);
     }
 

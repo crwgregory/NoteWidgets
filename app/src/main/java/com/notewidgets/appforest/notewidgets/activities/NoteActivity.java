@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.notewidgets.appforest.notewidgets.BuildConfig;
 import com.notewidgets.appforest.notewidgets.R;
 import com.notewidgets.appforest.notewidgets.helpers.SQLiteHelper;
+import com.notewidgets.appforest.notewidgets.helpers.WidgetHelper;
 import com.notewidgets.appforest.notewidgets.model.Note;
 
 public class NoteActivity extends AppCompatActivity {
@@ -61,6 +62,56 @@ public class NoteActivity extends AppCompatActivity {
         }
     }
 
+    public void saveNote(View view){
+        Log.d(CLASS_NAME, "saveNote()");
+        Log.d(CLASS_NAME, "appWidgetId: " + mAppWidgetId);
+        Note note = new Note(sqLiteHelper);
+        noteTitle = ((EditText) findViewById(R.id.main_edit_title_text)).getText().toString();
+        noteBody = ((EditText) findViewById(R.id.main_edit_text)).getText().toString();
+        Log.d(CLASS_NAME, noteBody);
+        note.saveNote(mAppWidgetId, noteTitle, noteBody);
+        updateWidget(mAppWidgetId, noteTitle, noteBody);
+        returnResult();
+        finish();
+    }
+
+    private void returnResult() {
+        Log.d(CLASS_NAME, "returnResult()");
+        Intent resultValue = new Intent();
+        resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
+        setResult(RESULT_OK, resultValue);
+    }
+
+    public void updateWidget(Integer widgetId, String title, String body) {
+        WidgetHelper.updateWidget(this, widgetId, title, body);
+    }
+
+    private void setPendingIntent(RemoteViews views){
+        Log.d(CLASS_NAME, "setPendingIntent()");
+        Intent intent = new Intent(this.getApplicationContext(), this.getClass());
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, this.mAppWidgetId);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this.getApplicationContext(), this.mAppWidgetId, intent, 0);
+        views.setOnClickPendingIntent(R.id.note_widget, pendingIntent);
+    }
+
+    @Override
+    public void onPause(){
+        Log.d(CLASS_NAME, "onPause()");
+        super.onPause();
+    }
+
+    @Override
+    public void onStop(){
+        Log.d(CLASS_NAME, "onStop()");
+        super.onStop();
+    }
+
+    @Override
+     public void onDestroy(){
+        Log.d(CLASS_NAME, "onDestroy()");
+        super.onDestroy();
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -82,100 +133,6 @@ public class NoteActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
-
-    @Override
-    public void onSaveInstanceState(Bundle state){
-        Log.d(CLASS_NAME, "onSaveInstanceState()");
-        super.onSaveInstanceState(state);
-    }
-
-    @Override
-    public void onRestoreInstanceState(Bundle state){
-        Log.d(CLASS_NAME, "onRestoreInstanceState()");
-        super.onRestoreInstanceState(state);
-    }
-
-    public void saveNote(View view){
-        Log.d(CLASS_NAME, "saveNote()");
-        Log.d(CLASS_NAME, "appWidgetId: " + mAppWidgetId);
-        Note note = new Note(sqLiteHelper);
-        noteTitle = ((EditText) findViewById(R.id.main_edit_title_text)).getText().toString();
-        noteBody = ((EditText) findViewById(R.id.main_edit_text)).getText().toString();
-        note.saveNote(mAppWidgetId, noteTitle, noteBody);
-        updateWidget();
-        returnResult();
-        finish();
-    }
-
-    private void returnResult() {
-        Log.d(CLASS_NAME, "returnResult()");
-        Intent resultValue = new Intent();
-        resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
-        setResult(RESULT_OK, resultValue);
-    }
-
-    private void updateWidget() {
-        Log.d(CLASS_NAME, "updateWidget()");
-        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
-        RemoteViews views = new RemoteViews(this.getPackageName(), R.layout.note_widget);
-        views.setTextViewText(R.id.widget_title_text, noteTitle);
-        views.setTextViewText(R.id.widget_body_text, noteBody);
-        setPendingIntent(views);
-        appWidgetManager.updateAppWidget(mAppWidgetId, views);
-    }
-
-    private void setPendingIntent(RemoteViews views){
-        Log.d(CLASS_NAME, "setPendingIntent()");
-        Intent intent = new Intent(this.getApplicationContext(), this.getClass());
-        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, this.mAppWidgetId);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this.getApplicationContext(), this.mAppWidgetId, intent, 0);
-        views.setOnClickPendingIntent(R.id.widget_body_text, pendingIntent);
-    }
-
-    @Override
-    public void onPause(){
-        Log.d(CLASS_NAME, "onPause()");
-        super.onPause();
-    }
-
-    @Override
-    public void onStop(){
-        Log.d(CLASS_NAME, "onStop()");
-        super.onStop();
-    }
-
-    @Override
-     public void onDestroy(){
-        Log.d(CLASS_NAME, "onDestroy()");
-        super.onDestroy();
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     private void enableStrictMode() {
         if(BuildConfig.DEBUG){
