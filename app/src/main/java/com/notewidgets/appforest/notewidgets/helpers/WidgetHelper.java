@@ -8,6 +8,7 @@ import android.util.Log;
 import android.widget.RemoteViews;
 
 import com.notewidgets.appforest.notewidgets.R;
+import com.notewidgets.appforest.notewidgets.activities.NoteActivity;
 
 /**
  * Created by Greg Christopherson on 11/6/2015.
@@ -16,7 +17,7 @@ public class WidgetHelper {
 
     private static String CLASS_NAME;
 
-    public WidgetHelper(){
+    public WidgetHelper() {
         CLASS_NAME = getClass().getName();
     }
 
@@ -30,9 +31,11 @@ public class WidgetHelper {
         appWidgetManager.updateAppWidget(widgetId, views);
     }
 
-    private static void setPendingIntent(Context context, RemoteViews views, Integer widgetId){
+    private static void setPendingIntent(Context context, RemoteViews views, Integer widgetId) {
         Log.d(CLASS_NAME, "setPendingIntent()");
-        Intent intent = new Intent(context.getApplicationContext(), context.getClass());
+        //Refer to App Widget Documentation "Using the AppWidgetProvider Class"for more information
+        //https://developer.android.com/guide/topics/appwidgets/index.html#AppWidgetProvider
+        Intent intent = new Intent(context.getApplicationContext(), NoteActivity.class);
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId);
         PendingIntent pendingIntent = PendingIntent.getActivity(context.getApplicationContext(), widgetId, intent, 0);
         views.setOnClickPendingIntent(R.id.note_widget, pendingIntent);
